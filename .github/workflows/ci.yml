@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # From: https://github.com/rust-lang/rust-analyzer/blob/master/.github/workflows/ci.yaml
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUST_BACKTRACE: short
+  RUSTUP_MAX_RETRIES: 10
+
+# Cancel previous runs of the same workflow on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typescript:
+    name: TypeScript CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter files
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changes:
+              - './packages/**'
+              - '.github/workflows/ci.yml'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
+              - 'prettier.config.mjs'
+              - 'tsconfig.json'
+              - '.prettierignore'
+              - '.editorconfig'
+              - '.gitignore'
+
+      - name: Install NodeJS
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Install pnpm dependencies
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: pnpm i --frozen-lockfile
+
+      - name: Check format with Prettier
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: pnpm prettier --check .
+
+      - name: Typecheck with TypeScript
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: pnpm typecheck
+
+  rust:
+    name: Rust CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter files
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changes:
+              - './src/**'
+              - './httpz/**'
+              - '.github/workflows/ci.yml'
+              - 'Cargo.toml'
+              - '.rustfmt.toml'
+              - '.editorconfig'
+              - '.gitignore'
+
+      - name: Install system dependencies
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: |-
+          sudo apt-get -yqq update
+          sudo apt-get install -yqq libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Install Rust toolchain
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: rustup toolchain install stable --profile minimal
+
+      - name: Check Rust format
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: cargo fmt -- --check
+
+      - name: Install Rust dependencies
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: cargo +stable install cargo-hack --locked
+
+      - name: Check Rust crate
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        run: cargo hack check --feature-powerset --no-dev-deps --group-features bigdecimal,bit-vec,bson,bytesize,chrono,glam,indexmap,ipnetwork,mac_address,rust_decimal,time,uhlc,uuid
+
+      - name: Run Clippy
+        if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
+        uses: giraffate/clippy-action@v1
+        with:
+          reporter: github-pr-review
+          tool_name: 'Clippy'
+          filter_mode: diff_context
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          clippy_flags: --workspace --all-features --locked
+          fail_on_error: true

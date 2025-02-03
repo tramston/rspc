@@ -1,0 +1,68 @@
+[package]
+name    = "rspc"
+version = "0.1.4"
+
+authors     = ["Oscar Beaumont <oscar@otbeaumont.me>"]
+description = "A blazing fast and easy to use TRPC server for Rust."
+edition     = "2021"
+license     = "MIT"
+
+repository = "https://github.com/spacedriveapp/rspc"
+
+categories = ["asynchronous", "web-programming"]
+include    = ["/LICENCE", "/README.md", "/src"]
+keywords   = ["async", "rust-to-ts", "specta", "typesafe", "typescript"]
+
+# /bin/sh RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features
+[package.metadata."docs.rs"]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = []
+
+alpha    = []            # APIs that are not yet stable
+tauri    = ["dep:tauri"]
+unstable = []            # APIs where one line of code can blow up your whole app
+
+# Webservers
+axum = ["dep:httpz"]
+
+# Specta # TODO: Remove all of these with v1
+bigdecimal   = ["specta/bigdecimal"]
+bit-vec      = ["specta/bit-vec"]
+bson         = ["specta/bson"]
+bytesize     = ["specta/bytesize"]
+chrono       = ["specta/chrono"]
+glam         = ["specta/glam"]
+indexmap     = ["specta/indexmap"]
+ipnetwork    = ["specta/ipnetwork"]
+mac_address  = ["specta/mac_address"]
+rust_decimal = ["specta/rust_decimal"]
+time         = ["specta/time"]
+uhlc         = ["specta/uhlc"]
+uuid         = ["specta/uuid"]
+
+[dependencies]
+# Inner Sub-crates
+httpz = { path = "./httpz", optional = true }
+
+# Dependencies
+futures              = "0.3.31"
+futures-channel      = "0.3.31"
+futures-locks        = { version = "0.7.1", features = ["tokio"] }
+nougat               = "0.2.4"
+pin-project          = "1.1"
+serde                = { version = "1.0", features = ["derive"] }
+serde_json           = "1.0"
+specta               = { version = "=2.0.0-rc.20", features = ["derive", "serde", "serde_json"] }
+specta-datatype-from = { git = "https://github.com/specta-rs/specta", rev = "8509af0162" }
+specta-serde         = { version = "=0.0.7" }
+specta-typescript    = { version = "=0.0.7", features = ["function"] }
+tauri                = { version = "2.0", optional = true }
+thiserror            = "1.0"
+tokio                = { version = "1.40", features = ["macros", "rt", "sync"] }
+tracing              = { version = "0.1.37" }
+
+[workspace]
+members = ["./httpz"]

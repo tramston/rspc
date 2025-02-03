@@ -1,0 +1,22 @@
+{
+  "name": "@tramston/rspc-workspace",
+  "version": "1.0.0",
+  "description": "A blazingly fast and easy to use TRPC-like server for Rust.",
+  "keywords": [],
+  "author": "Oscar Beaumont",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "test": "echo 'No tests yet.' >&2 && exit 1",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "client": "pnpm --filter @tramston/rspc-client -- ",
+    "react": "pnpm --filter @tramston/rspc-react -- ",
+    "tauri": "pnpm --filter @tramston/rspc-tauri -- "
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@ianvs/prettier-plugin-sort-imports": "^4.3.1"
+  },
+  "packageManager": "pnpm@9.12.1"
+}

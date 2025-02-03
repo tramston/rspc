@@ -1,0 +1,24 @@
+{
+  "name": "@tramston/rspc-react",
+  "version": "0.2.0",
+  "description": "A blazingly fast and easy to use TRPC-like server for Rust.",
+  "keywords": [],
+  "author": "Oscar Beaumont",
+  "license": "MIT",
+  "main": "src/v2.ts",
+  "scripts": {
+    "test": "echo 'No tests yet.' >&2 && exit 1"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.59"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "react": "^18.3.1",
+    "@tramston/rspc-client": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "@tramston/rspc-client": "^0.2.0"
+  }
+}
