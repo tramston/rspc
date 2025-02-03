@@ -15,7 +15,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryResult,
-} from '@tramston/react-query'
+} from '@tanstack/react-query'
 import type { ReactElement } from 'react'
 
 import { AlphaClient, RSPCError } from '@tramston/rspc-client'
@@ -27,7 +27,7 @@ import {
   hashKey,
   QueryClient,
   QueryClientProvider,
-} from '@tramston/react-query'
+} from '@tanstack/react-query'
 import React, { useContext as _useContext, createContext, useEffect, useMemo } from 'react'
 
 export interface BaseOptions<TProcedures extends ProceduresDef> {
