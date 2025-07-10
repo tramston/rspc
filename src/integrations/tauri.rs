@@ -106,6 +106,9 @@ where
 
             window.listen("plugin:rspc:transport", {
                 let window = window.clone();
+                if (window.label() != "main") {
+                    return;
+                }
                 move |event| {
                     let v = match serde_json::from_str::<serde_json::Value>(event.payload()) {
                         Ok(v) => match v {
@@ -191,6 +194,10 @@ where
     let manager = WindowManager::new(move |_| ctx_fn(), router);
     Builder::new("rspc")
         .on_page_load(move |webview, _page| {
+            if (webview.window().label() != "main") {
+                return;
+            }
+
             manager.clone().on_page_load(webview.window());
 
             webview.window().on_window_event({
