@@ -48,7 +48,7 @@ jobs:
 
       - name: Install NodeJS
         if: steps.filter.outcome != 'success' || steps.filter.outputs.changes == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
